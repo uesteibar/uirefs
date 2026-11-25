@@ -324,8 +324,20 @@ function zoom(img) {
   z.tabIndex = -1;
   z.innerHTML = `<img src="${esc(img.currentSrc || img.src)}" alt="${esc(img.alt)}">`;
   const back = document.activeElement;
-  const close = () => { z.classList.add("out"); setTimeout(() => z.remove(), 200); removeEventListener("keydown", onKey, true); back?.focus({ preventScroll: true }); };
-  const onKey = e => { if (e.key === "Escape") { e.stopPropagation(); e.preventDefault(); close(); } };
+  let closed = false;
+  const close = () => {
+    if (closed) return;
+    closed = true;
+    z.classList.add("out");
+    setTimeout(() => { z.remove(); removeEventListener("keydown", onKey, true); }, 200);
+    (back && back !== document.body && back.isConnected ? back : panel).focus({ preventScroll: true });
+  };
+  /* the open lightbox owns the keyboard: no shortcut runs behind it, scroll keys keep their default */
+  const onKey = e => {
+    e.stopPropagation();
+    if (e.key === "Escape") { e.preventDefault(); close(); }
+    else if (e.key === "Tab") e.preventDefault();
+  };
   z.addEventListener("click", close);
   addEventListener("keydown", onKey, true);
   document.body.append(z);
