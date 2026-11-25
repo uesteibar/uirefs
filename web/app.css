@@ -261,9 +261,9 @@ body.open .panel { transform: none; }
 .foot .kill { background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
 
 /* image zoom */
-.zoom { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 28px; background: rgba(246,246,245,.9);
-  -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); cursor: zoom-out; animation: fadein .3s var(--out); }
-.zoom img { max-width: 100%; max-height: 100%; border-radius: 14px; box-shadow: var(--sh2); animation: zin .5s var(--spring); }
+.zoom { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 28px; overflow-y: auto; overscroll-behavior: contain;
+  background: rgba(246,246,245,.9); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); cursor: zoom-out; outline: none; animation: fadein .3s var(--out); }
+.zoom img { max-width: 100%; border-radius: 14px; box-shadow: var(--sh2); animation: zin .5s var(--spring); }
 .zoom.out { animation: fadeout .2s ease-in forwards; }
 @keyframes fadein { from { opacity: 0; } } @keyframes fadeout { to { opacity: 0; } }
 @keyframes zin { from { transform: scale(.92); opacity: 0; } }
