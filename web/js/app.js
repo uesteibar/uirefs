@@ -321,12 +321,15 @@ function collapseDemo() {
 function zoom(img) {
   const z = document.createElement("div");
   z.className = "zoom";
+  z.tabIndex = -1;
   z.innerHTML = `<img src="${esc(img.currentSrc || img.src)}" alt="${esc(img.alt)}">`;
-  const close = () => { z.classList.add("out"); setTimeout(() => z.remove(), 200); removeEventListener("keydown", onKey, true); };
+  const back = document.activeElement;
+  const close = () => { z.classList.add("out"); setTimeout(() => z.remove(), 200); removeEventListener("keydown", onKey, true); back?.focus({ preventScroll: true }); };
   const onKey = e => { if (e.key === "Escape") { e.stopPropagation(); e.preventDefault(); close(); } };
   z.addEventListener("click", close);
   addEventListener("keydown", onKey, true);
   document.body.append(z);
+  z.focus({ preventScroll: true });
 }
 
 /* ---------- copy link: the shareable /r/<id>, with a fallback for non-secure contexts ---------- */
