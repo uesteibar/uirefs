@@ -4,10 +4,11 @@ Use it for any demo that moves (a transition, a gesture, a scroll effect, a loop
 
 Skip it for a fully static piece, and for a demo that is the source's own code running unchanged (then check that it plays and stop).
 
+This guide checks a demo you already built. To build it from a clip (frames, motion table, measured numbers), see `animation-reproduction.md` first.
+
 ## 1. Know the clip
 
-- `ffprobe -v error -show_entries stream=r_frame_rate,width,height -of csv=p=0 clip.mp4` gives frame rate and size. Use the largest file the source offers.
-- One contact sheet for orientation only: `ffmpeg -i clip.mp4 -vf "fps=16/<duration>,scale=360:-1,tile=4x4" -frames:v 1 sheet.png`. Find the seconds where something moves, what triggers it, and where the pointer is when it does.
+You need the frame rate and size of the clip (`ffprobe -v error -show_entries stream=r_frame_rate,width,height -of csv=p=0 clip.mp4`) and the seconds where something moves. If you did not do the work in `animation-reproduction.md`, do its section 1 now.
 
 ## 2. Write down what the user does
 
@@ -29,6 +30,8 @@ node frame-compare.mjs --demo ../demo.html --clip ../clip.mp4 --actions ../actio
 ```
 
 `--start` is the moment in the clip where the action begins. `--crop` cuts the clip to the subject (ffmpeg `W:H:X:Y`); `--demo-crop` does the same for the demo (`X:Y:W:H`, CSS pixels). Add `--webgl` for canvas or WebGL scenes. `CHROME=/path/to/chromium` uses an installed browser. ffmpeg must be on `PATH`.
+
+A demo that plays by itself needs no input: pass `--autoplay` with an empty actions file (`[]`); the timeline then starts when the page loads, so `--start 0` lines the clip and the demo up.
 
 It plays the actions with real input in a sandboxed iframe, records the page with the browser's own frame times, and writes `cmp/strip.png`: the clip on the top row, the demo on the bottom row, the same moments left to right. `cmp/report.json` lists the demo frame chosen for each tile and any page errors.
 

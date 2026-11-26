@@ -3,7 +3,7 @@
 //
 //   node frame-compare.mjs --demo demo.html --clip clip.mp4 --actions actions.json --out cmp \
 //        [--start 4.2] [--dur 2] [--fps 30] [--crop W:H:X:Y] [--demo-crop X:Y:W:H] \
-//        [--viewport 900x700] [--frames 8 | --at 0,0.1,0.25,0.5] [--tile 320x320] [--offset 0] [--webgl] [--direct]
+//        [--viewport 900x700] [--frames 8 | --at 0,0.1,0.25,0.5] [--tile 320x320] [--offset 0] [--webgl] [--direct] [--autoplay]
 //
 // What it does
 //   1. Cuts `--dur` seconds of the clip, starting at `--start`, into frames at `--fps` (ffmpeg).
@@ -23,6 +23,9 @@
 //
 // Align the two timelines on the moment the action starts: `--start` is that moment in the clip. If the demo
 // reacts later or earlier than the clip, shift it with `--offset` (ms) and say so in the report.
+//
+// `--autoplay`: for a demo that plays by itself on load (no input needed): the timeline starts at load, so `--start`
+// is the second of the clip that matches the demo's first frame.
 //
 // Needs: node 18+, ffmpeg and ffprobe on PATH, and `npm install playwright` next to this file
 // (set CHROME=/path/to/chromium to use an installed browser instead of Playwright's). `--webgl` turns on
@@ -68,12 +71,14 @@ const page = await browser.newPage({ viewport: { width: vw, height: vh } });
 const errors = [];
 page.on("pageerror", e => errors.push(e.message));
 page.on("console", m => { if (m.type() === "error") errors.push(m.text().slice(0, 200)); });
-if (opt.direct) await page.goto("file://" + path.resolve(opt.demo));
-else {
-  await page.setContent(`<!doctype html><body style="margin:0"><iframe id="f" sandbox="allow-scripts" style="border:0;width:${vw}px;height:${vh}px"></iframe>`);
-  await page.evaluate(h => { document.getElementById("f").srcdoc = h; }, html);
-}
-await page.waitForTimeout(1200); // let fonts, images and the first frame settle
+// With --autoplay the demo plays by itself from the moment it loads: recording starts first and the
+// timeline starts when the page is loaded, so the clip and the demo begin together.
+const load = async () => {
+  if (opt.direct) await page.goto("file://" + path.resolve(opt.demo));
+  else await page.evaluate(h => { document.getElementById("f").srcdoc = h; }, html);
+};
+if (!opt.direct) await page.setContent(`<!doctype html><body style="margin:0"><iframe id="f" sandbox="allow-scripts" style="border:0;width:${vw}px;height:${vh}px"></iframe>`);
+if (!opt.autoplay) { await load(); await page.waitForTimeout(1200); } // let fonts, images and the first frame settle
 
 const cdp = await page.context().newCDPSession(page);
 const raw = []; let seq = 0;
@@ -84,6 +89,7 @@ cdp.on("Page.screencastFrame", ev => {
 });
 await cdp.send("Page.startScreencast", { format: "png", everyNthFrame: 1 });
 await page.waitForTimeout(250);
+if (opt.autoplay) { await load(); await page.waitForTimeout(30); }
 
 const sleep = ms => new Promise(r => setTimeout(r, Math.max(0, ms)));
 const T0 = Date.now();

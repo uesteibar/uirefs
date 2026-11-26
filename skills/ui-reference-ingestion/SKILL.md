@@ -19,6 +19,7 @@ Load it when you are given links, tweets or sites to save as references, or aske
 - **Do not break access control:** no forged logins, no API calls the page does not make, no paid downloads. Gated code is recreated from the public preview and tagged `recreated`.
 - **Collections have no cap.** Save what the user asks for. If they say "the components" of a big library and not which, ask whether they want all of them, a selection or a number. Classify by what you would copy.
 - Write `behavior` from frames and DOM you actually looked at. Say what you could not see instead of guessing.
+- **Reproduce motion from numbers.** Before you build a demo that moves, write a motion table (what moves, when, in which order, with what curve) from measurements of the clip's frames, not from a description: `references/animation-reproduction.md`.
 - **A demo that moves is compared with its source frame by frame.** A screenshot at rest and a clean console do not show that the motion is right. Follow `references/animation-verification.md`, attach the comparison strip, and say in `behavior` which transitions you compared and which you did not.
 
 ## Procedure per source
@@ -31,7 +32,7 @@ Load it when you are given links, tweets or sites to save as references, or aske
    4. the page saved as one HTML file;
    5. nothing usable: recreate.
 3. **Make one self-contained HTML file.** React/TS goes through `templates/bundle-component.mjs` (Tailwind or shadcn code: `templates/bundle-tailwind-component.mjs`, see `references/demo-extraction.md`); plain HTML is used as is. The demo runs in a sandboxed iframe with an opaque origin: no cookies, `localStorage` or access to `parent`; scripts, styles, fonts and images from https are fine.
-4. **Recreate when the code is gated** (paid component, WebGL scene, video-only). If the `ui-reference-recreation` skill is installed, it has the full procedure (preview, reference pack, spec, review). Without it: write down the measurable facts first (layout, colours, text, sizes, timings, every interaction), build one HTML file from them, then verify it (next step). If a recreation does not converge, say so in the description and save without a demo.
+4. **Recreate when the code is gated** (paid component, WebGL scene, video-only). If the `ui-reference-recreation` skill is installed, it has the full procedure (preview, reference pack, spec, review). Without it: write down the measurable facts first (layout, colours, text, sizes, timings, every interaction), build one HTML file from them (for anything that moves, `references/animation-reproduction.md`: a motion table with measured numbers before the code), then verify it (next step). If a recreation does not converge, say so in the description and save without a demo.
 5. **Verify.** A demo with motion (animation, transition, gesture, scroll effect): compare it with the source frame by frame, `references/animation-verification.md`; `templates/frame-compare.mjs` makes the comparison strip. A static piece: look at it at rest and after each interaction, at 1440 and 390 wide.
 6. **A clip of a live component:** when the source has no video, see the CDP frame-loop recipe in `references/demo-extraction.md`.
 7. **Save.** New reference: one `add` with images (the comparison strip among them), demo and clip. Existing reference without a demo: `update` with `assets`.
