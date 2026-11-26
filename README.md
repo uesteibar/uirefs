@@ -92,6 +92,27 @@ The service answers only to `localhost`, IP addresses and the host in `UIREFS_PU
 page. `POST /mcp` refuses cross-origin and non-JSON requests. An MCP caller can make `add` read a local file
 or fetch a URL as an asset: that is a feature for your agents, so only connect agents you trust.
 
+## Update
+
+The service and the skills are updated separately.
+
+**The service.** In your checkout, `git pull` and run `./install.sh` again. It rebuilds the binary and restarts the
+service; your data is kept.
+
+```sh
+cd uirefs && git pull && ./install.sh
+```
+
+**The skills.** If you installed them with `npx skills add`, update them with:
+
+```sh
+npx -y skills update -g -y
+```
+
+`npx -y skills list` shows what is installed. If an update does not bring a skill up to date, install it again with the
+command in [Skills](#skills-optional); it overwrites the old copy. If your agent reads the skills straight from your
+checkout (a link to `skills/`), `git pull` is enough.
+
 ## Build
 
 ```sh
